@@ -1,10 +1,13 @@
 let ObjectID = require('mongodb').ObjectID;
 
-module.exports = function(app, db) {
+module.exports = function(app, database) {
+    let notesDB = database.db('notes');
+    let notesCollection = notesDB.collection('notes');
+
     app.post('/notes', (req, res) => {
         const note = { text: req.body.body, title: req.body.title };
 
-        db.collection('notes').insert(note, (err, result) => {
+        notesCollection.insert(note, (err, result) => {
             err ? res.send({ 'error': 'An error has occurred' }) : res.send(result.ops[0]);
         });
     });
@@ -12,7 +15,7 @@ module.exports = function(app, db) {
     app.get('/notes', (req, res) => {
         const id = req.params.id;
 
-        db.collection('notes').find({}).toArray((err, items) => {
+        notesCollection.find({}).toArray((err, items) => {
             err ? res.send({'error':'An error has occurred'}) : res.send(items);
         });
     });
@@ -21,7 +24,7 @@ module.exports = function(app, db) {
         const id = req.params.id;
         const details = { '_id': new ObjectID(id) };
 
-        db.collection('notes').findOne(details, (err, item) => {
+        notesCollection.findOne(details, (err, item) => {
             err ? res.send({'error':'An error has occurred'}) : res.send(item);
         });
     });
@@ -31,7 +34,7 @@ module.exports = function(app, db) {
         const details = { '_id': new ObjectID(id) };
         const note = { text: req.body.body, title: req.body.title };
 
-        db.collection('notes').update(details, note, (err, result) => {
+        notesCollection.update(details, note, (err, result) => {
             err ? res.send({'error':'An error has occurred'}) : res.send(note);
         });
     });
@@ -40,9 +43,8 @@ module.exports = function(app, db) {
         const id = req.params.id;
         const details = { '_id': new ObjectID(id) };
 
-        db.collection('notes').remove(details, (err, item) => {
+        notesCollection.remove(details, (err, item) => {
             err ? res.send({'error':'An error has occurred'}) : res.send('Note ' + id + ' deleted!');
         });
     });
-
 };
