@@ -1,98 +1,37 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const BlogModel = require('../models/blog');
+// const BlogModel = require('../models/blog');
 const remoteDbUrl = require('./../../config/db').url;
-const auth = require("../controllers/AuthenticationController.js");
+const blog = require("../controllers/BlogController.js");
 
 mongoose.connect(remoteDbUrl)
-    .then(() =>  console.log('connection succesful'))
-    .catch((err) => console.error(err));
-const db = mongoose.connection;
+        .then(() =>  console.log('connection succesful'))
+        .catch((err) => console.error(err));
 
-/*---------------------------------------------------------*/
-/*
- * Check the request if the user is authenticated.
- * Return an error message if not, otherwise keep going :)
- */
-function ensureLoggedIn() {
+// const db = mongoose.connection;
+
+const checkForLogin = () => {
     return function(req, res, next) {
-        // isAuthenticated is set by `deserializeUser()`
         if (!req.isAuthenticated || !req.isAuthenticated()) {
             res.status(401).send({
                 success: false,
                 message: 'You need to be authenticated to access this page!'
             });
-        } else{
-            next();
+        } else {
+            next()
         }
     }
 }
-/*---------------------------------------------------------*/
 
-/**
- * GETs blogs in database.
- */
-router.get('/', ensureLoggedIn(), (req, res) => {
-    BlogModel.find({}).then(blogs => {
-        res.send(blogs);
-    });
-});
+router.get('/', checkForLogin(), blog.getAllBlogs);
 
-/**
- * GETs blog instanace by ID.
- */
-router.get('/:id', (req, res, next) => {
-    BlogModel.findById(req.params.id).then(blog => {
-        if (!blog) {
-            let err = new Error('Not found');
-            err.status = 404;
-            next(err);
-            return;
-        }
-        res.send(blog);
-    }).catch(err => {
-        err.status = 404;
-        next(err)
-    });
-});
+router.get('/:id', blog.getBlogById);
 
-/**
- * POSTs create a blog instance
- */
-router.post('/', (req, res) => {
-    let blog = new BlogModel(req.body);
-    blog.save().then(createdBlog => {
-        res.json(createdBlog);
-    })
-});
+router.post('/', blog.postBlog);
 
-/**
- * PUTs update a blog instance
- */
-router.put('/:id', (req, res, next) => {
-    BlogModel.findByIdAndUpdate(req.params.id, req.body, {new: true, upsert: true})
-        .then(blog => {
-            res.json(blog);
-        }).catch(err => {
-        err.status = 404;
-        next(err);
-    });
-});
+router.put('/:id', blog.updateBlogById);
 
-/**
- * PUTs update a blog instance
- */
-router.delete('/:id', (req, res, next) => {
-    BlogModel.findByIdAndRemove(req.params.id)
-        .then(deletedBlog => {
-            res.json({
-                id: deletedBlog.id
-            });
-        }).catch(err => {
-        err.status = 404;
-        next(err);
-    });
-});
+router.delete('/:id', blog.deleteBlogById);
 
 module.exports = router;
