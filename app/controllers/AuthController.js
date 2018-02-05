@@ -4,7 +4,7 @@ const User = require("../models/User");
 
 const userController = {};
 
-userController.home = function(req, res) {
+userController.home = (req, res) => {
     res.render('index', {
         title: 'Hello',
         greet: 'Nice to see u',
@@ -12,11 +12,11 @@ userController.home = function(req, res) {
     });
 };
 
-userController.signup = function(req, res) {
+userController.signup = (req, res) => {
     res.render('signup');
 };
 
-userController.postSignup = function(req, res) {
+userController.postSignup = (req, res) => {
     User.register(
         new User({
             username : req.body.username,
@@ -26,24 +26,24 @@ userController.postSignup = function(req, res) {
         (err, user) => {
             if (err) return res.render('signup', { user : user });
             
-            passport.authenticate('local')(req, res, function () {
+            passport.authenticate('local')(req, res,  () => {
                 res.redirect('/');
             });
         }
     );
 };
 
-userController.login = function(req, res) {
+userController.login = (req, res) => {
     res.render('login');
 };
 
-userController.doLogin = function(req, res) {
-    passport.authenticate('local')(req, res, function () {
+userController.doLogin = (req, res) => {
+    passport.authenticate('local')(req, res,  () => {
         res.redirect('/');
     });
 };
 
-userController.logout = function(req, res) {
+userController.logout = (req, res) => {
     req.logout();
     res.redirect('/');
 };
