@@ -5,16 +5,19 @@ const db = require('./config/db');
 const logger = require('morgan');
 const path = require('path');
 const fs = require('fs');
+const cookieParser = require('cookie-parser');
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy; // Username and password authentication strategy for Passport and Node.js.
-
+const index = require('./app/routes/index');
+const blogs = require('./app/routes/blog-routes');
 const app = express();
 const port = 8000;
 
 let accessLogStream = fs.createWriteStream(path.join(__dirname, 'app/access.log'), {flags: 'a'});
 app.use(logger('combined', {stream: accessLogStream}));
-
+app.set('views', path.join(__dirname, 'app/views'));
+app.set('view engine', 'hbs');
 app.use(bodyParser.urlencoded({extened:true}));
 app.use(cookieParser());
 app.use(require('express-session')({
@@ -59,10 +62,7 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
     const errStatus = err.status;
     res.locals.message = err.message;
-    res.locals.error = {
-        ...err,
-        stack: ''
-    };
+    res.locals.error = Object.assign({}, err, {stack: ''});
 
     // render the error page
     res.status(err.status || 500);

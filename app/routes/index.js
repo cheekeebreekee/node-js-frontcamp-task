@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require("../controllers/AuthController.js");
+const auth = require("../controllers/AuthenticationController.js");
 
 
 // restrict index for logged in user only

@@ -1,0 +1,15 @@
+{{#if user}}
+    <li>
+        <a href="/login">log in</a>
+    </li>
+    <li>
+        <a href="/signup"> signup</a>
+    </li>
+    {{else}}
+    <li>
+        hello {{user.username}}
+    </li>
+    <li>
+        <a href="/logout">log out</a>
+    </li>
+{{/if}}

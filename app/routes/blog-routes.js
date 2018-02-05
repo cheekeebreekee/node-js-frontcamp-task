@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const BlogModel = require('../models/blog');
 const remoteDbUrl = require('./../../config/db').url;
-const auth = require("../controllers/AuthController.js");
+const auth = require("../controllers/AuthenticationController.js");
 
 mongoose.connect(remoteDbUrl)
     .then(() =>  console.log('connection succesful'))
@@ -23,9 +23,8 @@ function ensureLoggedIn() {
                 success: false,
                 message: 'You need to be authenticated to access this page!'
             });
-            // res.redirect('/')
         } else{
-            next()
+            next();
         }
     }
 }
